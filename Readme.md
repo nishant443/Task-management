@@ -8,51 +8,31 @@ Live Demo: your-live-demo-link.com
 ✨ Features
 
 Secure User Authentication: JWT-based authentication for user registration and login. Passwords are securely hashed.
-
 Full CRUD Functionality: Create, Read, Update, and Delete tasks with ease.
-
 Interactive Kanban Board: Drag-and-drop tasks between columns (e.g., 'To Do', 'In Progress', 'Done') to visually manage workflows.
-
 Role-Based Access Control (RBAC):
-
 Standard User: Can manage their own assigned tasks.
-
 Admin: Can view an admin dashboard, manage all users, and oversee all tasks in the system.
-
 Protected Routes: Secure client-side and server-side routes to prevent unauthorized access.
-
 Responsive Design: Seamless experience across desktop, tablet, and mobile devices.
-
 Pagination: Efficiently handles large numbers of tasks and users without sacrificing performance.
-
 Centralized API Management: Clean and organized way to handle all frontend API requests.
 
 🛠️ Technology Stack
 
 Backend
-
 Node.js: JavaScript runtime environment
-
 Express.js: Web framework for building RESTful APIs
-
 MongoDB: NoSQL database for storing user and task data
-
 Mongoose: ODM library for MongoDB
-
 JSON Web Token (JWT): Secure authentication
-
 bcryptjs: Hashing passwords
-
 dotenv: Environment variables
 
 Frontend
-
 React: JavaScript library for UI
-
 React Router: Client-side routing
-
 React Context API: Global state management
-
 Axios: HTTP requests
 
 CSS: Custom styling (Register.css, App.css, index.css)
@@ -141,4 +121,5 @@ Nishant Kumar
 
 GitHub: [@nishant443](https://github.com/nishant443)
 
-LinkedIn: Nishant Singh
+LinkedIn: [Nishant Singh](https://www.linkedin.com/in/nishant-singh-432bb922a/)
+
