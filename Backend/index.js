@@ -9,13 +9,24 @@ const taskRoutes = require("./routes/tasks");
 const app = express();
 
 // Middleware
+// app.use(
+//   cors({
+//     origin: "https://gentle-biscotti-d5f7f7.netlify.app",
+//     methods: ["GET", "POST", "PUT", "DELETE"],
+//     allowedHeaders: ["Content-Type", "Authorization"],
+//   })
+// );
 app.use(
   cors({
-    origin: "https://gentle-biscotti-d5f7f7.netlify.app",
+    origin: [
+      "http://localhost:5173", // for local development
+      "https://gentle-biscotti-d5f7f7.netlify.app", // your Netlify site
+    ],
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
+
 app.use(express.json());
 
 // ✅ Test Route (add this here)
