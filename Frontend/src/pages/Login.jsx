@@ -22,30 +22,21 @@ export default function Login() {
         setIsLoading(true);
 
         try {
-            const res = await API.post("/auth/login", form); // -> POST http://localhost:5000/api/auth/login
-            const data = res.data || {};
+            const res = await API.post("/auth/login", form);
+            const { user, token } = res.data; // <- correct extraction
 
-            // extract user & token in a flexible way
-            const user = data.user || data.userData || data;
-            const token = data.token || data.accessToken || data.jwt;
+            if (!user || !token) throw new Error("Invalid login response");
 
-            // call context login if provided (most apps will do token storage here)
-            if (typeof loginFromContext === "function") {
-                loginFromContext(user, token);
-            } else {
-                // fallback: store token + user locally
-                if (token) localStorage.setItem("token", token);
-                if (user && typeof user === "object") localStorage.setItem("user", JSON.stringify(user));
-            }
+            const userWithToken = { ...user, token };
+            localStorage.setItem("user", JSON.stringify(userWithToken));
 
             toast.success("Signed in successfully!");
-            // navigate to home (adjust if you want different route)
-            navigate("/");
+            navigate("/"); // go to home
         } catch (err) {
             console.error("Login error:", err);
             const message =
-                err?.response?.data?.msg ||
                 err?.response?.data?.message ||
+                err?.response?.data?.msg ||
                 err?.message ||
                 "Login failed. Please try again.";
             toast.error(message);
@@ -53,6 +44,8 @@ export default function Login() {
             setIsLoading(false);
         }
     };
+
+
 
     return (
         <div className="min-h-screen font-sans antialiased bg-white grid lg:grid-cols-2 overflow-x-hidden">

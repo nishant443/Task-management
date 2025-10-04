@@ -13,6 +13,10 @@ router.post("/register", async (req, res) => {
     try {
         const { name, email, password, role } = req.body;
 
+        // Basic validation
+        if (!name || !email || !password)
+            return res.status(400).json({ message: "Please provide all fields" });
+
         const existingUser = await User.findOne({ email });
         if (existingUser)
             return res.status(400).json({ message: "Email already exists" });
@@ -27,7 +31,7 @@ router.post("/register", async (req, res) => {
         });
 
         await user.save();
-        res.status(201).json({ message: `${role || "User"} registered successfully`, user });
+        res.status(201).json({ message: `${role || "User"} registered successfully` });
     } catch (err) {
         console.error(err);
         res.status(500).json({ message: "Server error" });
@@ -37,34 +41,37 @@ router.post("/register", async (req, res) => {
 // --------------------
 // Login User/Admin
 // --------------------
-// POST /api/auth/login
 router.post("/login", async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // 1️⃣ Find user by email
+        if (!email || !password)
+            return res.status(400).json({ message: "Please provide email and password" });
+
         const user = await User.findOne({ email });
         if (!user) return res.status(400).json({ message: "Invalid credentials" });
 
-        // 2️⃣ Check if user is banned
-        if (user.banned) return res.status(403).json({ message: "Your account is banned" });
+        if (user.banned)
+            return res.status(403).json({ message: "Your account is banned" });
 
-        // 3️⃣ Check password
         const isMatch = await bcrypt.compare(password, user.passwordHash);
         if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
 
-        // 4️⃣ Generate JWT
-        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET || "secretkey", { expiresIn: "1d" });
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET || "secretkey",
+            { expiresIn: "1d" }
+        );
 
-        // 5️⃣ Respond with user data and token
+        // Send user info and token separately
         res.json({
             user: {
                 _id: user._id,
                 name: user.name,
                 email: user.email,
                 role: user.role,
-                token,
             },
+            token,
         });
     } catch (err) {
         console.error(err);
@@ -72,13 +79,12 @@ router.post("/login", async (req, res) => {
     }
 });
 
-
 // --------------------
 // Get all users (Admin only)
 // --------------------
 router.get("/users", auth, adminOnly, async (req, res) => {
     try {
-        const users = await User.find({}, "_id name email role");
+        const users = await User.find({}, "_id name email role banned");
         res.json({ users });
     } catch (err) {
         console.error(err);
@@ -86,8 +92,9 @@ router.get("/users", auth, adminOnly, async (req, res) => {
     }
 });
 
-module.exports = router;
-
+// --------------------
+// Ban a user (Admin only)
+// --------------------
 router.put("/ban/:id", auth, adminOnly, async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
@@ -97,11 +104,14 @@ router.put("/ban/:id", auth, adminOnly, async (req, res) => {
         await user.save();
         res.json({ message: `${user.name} is banned` });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ message: "Server error" });
     }
 });
 
-// Unban a user
+// --------------------
+// Unban a user (Admin only)
+// --------------------
 router.put("/unban/:id", auth, adminOnly, async (req, res) => {
     try {
         const user = await User.findById(req.params.id);
@@ -111,6 +121,7 @@ router.put("/unban/:id", auth, adminOnly, async (req, res) => {
         await user.save();
         res.json({ message: `${user.name} is unbanned` });
     } catch (err) {
+        console.error(err);
         res.status(500).json({ message: "Server error" });
     }
 });
