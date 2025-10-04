@@ -77,7 +77,41 @@ router.post("/login", async (req, res) => {
         console.error(err);
         res.status(500).json({ message: "Server error" });
     }
+}); router.post("/login", async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
+        if (!user) return res.status(400).json({ message: "Invalid credentials" });
+
+        if (user.banned) return res.status(403).json({ message: "Your account is banned" });
+
+        const isMatch = await bcrypt.compare(password, user.passwordHash);
+        if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+
+        // Generate JWT
+        const token = jwt.sign(
+            { id: user._id, role: user.role },
+            process.env.JWT_SECRET || "secretkey",
+            { expiresIn: "1d" }
+        );
+
+        // Send user info and token separately
+        res.json({
+            user: {
+                _id: user._id,
+                name: user.name,
+                email: user.email,
+                role: user.role,
+            },
+            token // <-- now token is separate
+        });
+
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ message: "Server error" });
+    }
 });
+
 
 // --------------------
 // Get all users (Admin only)
